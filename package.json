@@ -3,16 +3,43 @@
   "version": "1.0.0",
   "main": "index.js",
   "dependencies": {
+    "@expo-google-fonts/press-start-2p": "^0.4.1",
+    "@expo-google-fonts/vt323": "^0.4.1",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.23",
+    "expo-asset": "~58.0.20",
+    "expo-audio": "~58.0.11",
+    "expo-background-task": "~58.0.12",
+    "expo-battery": "~58.0.3",
+    "expo-font": "~58.0.11",
+    "expo-keep-awake": "~58.0.3",
+    "expo-notifications": "~58.1.8",
+    "expo-splash-screen": "~58.0.13",
     "expo-status-bar": "~58.0.4",
+    "expo-system-ui": "~58.0.7",
+    "expo-task-manager": "~58.0.13",
     "react": "19.3.0",
-    "react-native": "0.88.1"
+    "react-native": "0.88.1",
+    "react-native-background-actions": "^4.1.0",
+    "react-native-google-mobile-ads": "^17.4.0",
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-svg": "15.16.0"
   },
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "comment": "RNBA works via the New Arch interop layer; the directory just hasn't tested it.",
+        "exclude": [
+          "react-native-background-actions"
+        ]
+      }
+    }
   },
   "private": true
 }
