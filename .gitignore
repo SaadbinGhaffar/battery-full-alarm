@@ -42,3 +42,7 @@ yarn-error.*
 
 # EAS build artifacts (APK / AAB) downloaded locally
 /builds
+
+# Signing credentials (downloaded from EAS) -- never commit
+credentials.json
+/credentials

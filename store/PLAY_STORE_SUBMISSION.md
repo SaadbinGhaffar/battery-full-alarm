@@ -22,7 +22,7 @@ this repo.
 
 | What | Where it is |
 | --- | --- |
-| App bundle (**.aab**) for production | `builds/Charged-1.0.0-vc2-release.aab` |
+| App bundle (**.aab**) for production | `builds/Charged-1.0.0-vc3-release.aab` |
 | Test APK (optional, for sideloading) | `builds/Charged-1.0.0-preview.apk` |
 | Icon 512×512 | `store/icon-512.png` |
 | Feature graphic 1024×500 | `store/feature-graphic.png` |
@@ -150,9 +150,13 @@ Justification to submit:
 
 ## 8. App signing **[you]**
 - Keep **Play App Signing** enabled (default). Upload the `.aab`; Google manages the app signing
-  key, and your EAS key is the upload key.
-- Back up your EAS upload key: run `npx eas-cli credentials` → Android → download/export keystore,
-  and store it somewhere safe.
+  key, and your keystore is the **upload key**.
+- The upload key Play expects has SHA-1 `DB:6B:04:92:6C:66:34:01:0D:F5:12:42:8C:D8:99:D5:C3:58:BE:97`.
+  Builds sign with it via `"credentialsSource": "local"` in `eas.json`, which reads
+  `credentials.json` + `credentials/android/keystore.jks` from the project folder.
+- ⚠️ Those two files are **gitignored on purpose** (they contain passwords) and are needed for every
+  build. **Back them up** somewhere private (e.g. a password manager or encrypted drive). The same
+  key is also stored in your Expo account under the earlier `com.bigbyte.charged` credentials.
 
 ---
 
@@ -162,8 +166,8 @@ Justification to submit:
    you don't tap live ads.
 2. If on a personal account, run the required **Closed testing** (12 testers / 14 days).
 3. Then **Production → Create new release**:
-   - Upload `builds/Charged-1.0.0-vc2-release.aab`.
-   - Release name: `1.0.0 (2)`.
+   - Upload `builds/Charged-1.0.0-vc3-release.aab`.
+   - Release name: `1.0.0 (3)`.
    - Release notes: e.g. "First release of Charged: Battery Full Alarm."
    - Review → **Start rollout to Production**.
 
