@@ -1,6 +1,6 @@
 # Google Play Submission Checklist — Charged
 
-Everything needed to publish `com.bigbyte.charged`. Work top to bottom. Items marked
+Everything needed to publish `com.fathomstack.charged`. Work top to bottom. Items marked
 **[you]** can only be done by you in the Play Console / AdMob; the rest is already prepared in
 this repo.
 
@@ -22,7 +22,7 @@ this repo.
 
 | What | Where it is |
 | --- | --- |
-| App bundle (**.aab**) for production | `builds/Charged-1.0.0-vc5-release.aab` |
+| App bundle (**.aab**) for production | `builds/Charged-1.0.0-vc2-release.aab` |
 | Test APK (optional, for sideloading) | `builds/Charged-1.0.0-preview.apk` |
 | Icon 512×512 | `store/icon-512.png` |
 | Feature graphic 1024×500 | `store/feature-graphic.png` |
@@ -162,8 +162,8 @@ Justification to submit:
    you don't tap live ads.
 2. If on a personal account, run the required **Closed testing** (12 testers / 14 days).
 3. Then **Production → Create new release**:
-   - Upload `builds/Charged-1.0.0-vc5-release.aab`.
-   - Release name: `1.0.0 (5)`.
+   - Upload `builds/Charged-1.0.0-vc2-release.aab`.
+   - Release name: `1.0.0 (2)`.
    - Release notes: e.g. "First release of Charged: Battery Full Alarm."
    - Review → **Start rollout to Production**.
 
@@ -179,7 +179,7 @@ Justification to submit:
 ---
 
 ## Quick reference — IDs & URLs
-- Package: `com.bigbyte.charged`
+- Package: `com.fathomstack.charged`
 - AdMob App ID (Android): `ca-app-pub-2685624187820858~3600318632`
 - Banner unit: `ca-app-pub-2685624187820858/2314147961`
 - Native unit: `ca-app-pub-2685624187820858/5927099079`

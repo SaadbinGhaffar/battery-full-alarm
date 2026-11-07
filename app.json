@@ -10,7 +10,7 @@
     "backgroundColor": "#0E0410",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.bigbyte.charged",
+      "bundleIdentifier": "com.fathomstack.charged",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio",
@@ -23,7 +23,7 @@
       }
     },
     "android": {
-      "package": "com.bigbyte.charged",
+      "package": "com.fathomstack.charged",
       "adaptiveIcon": {
         "backgroundColor": "#FF7A1A",
         "foregroundImage": "./assets/android-icon-foreground.png",
