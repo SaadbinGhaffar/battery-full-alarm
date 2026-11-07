@@ -60,7 +60,7 @@ CHARGED is ad-supported. Ads are provided by Google AdMob.
 - **Tags:** battery, alarm, charging, battery health, utilities  *(choose up to 5 in console)*
 
 ## Contact details
-- **Email:** saad@bigbyte.com   *(required, shown publicly)*
+- **Email:** saadghaffar97@gmail.com   *(required, shown publicly)*
 - **Website:** https://saadbinghaffar.github.io/battery-full-alarm/
 - **Phone:** *(optional)*
 
