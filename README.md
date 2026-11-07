@@ -72,8 +72,12 @@ An orange‑led **80s synthwave / arcade** look:
   still), labels every control for screen readers, and caps font scaling on pixel display text.
 
 All retro primitives live in `src/components/retro/` and read from one token file,
-`src/theme/index.js`. The app icon, adaptive icon, splash and notification icon are generated
-pixel art in the same style.
+`src/theme/index.js`.
+
+**App icon** — a "battery alarm clock": a battery body with ringing twin bells, little feet
+and a glowing lightning bolt, on an orange sunset gradient with a faint retro grid. It ships as
+the launcher icon, Android adaptive icon (foreground, background and a monochrome version for
+themed icons), a glowing splash image, and a simplified battery-and-bolt status-bar icon.
 
 ## Ads (Google AdMob)
 

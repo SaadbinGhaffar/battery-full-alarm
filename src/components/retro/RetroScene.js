@@ -150,7 +150,9 @@ function RetroScene({ horizon = 0.5, speed = 'idle', accent = colors.orange }) {
             <Stop offset="0.8" stopColor={colors.orangeHot} />
             <Stop offset="1" stopColor="#E8203A" />
           </LinearGradient>
-          <RadialGradient id={ids.glow} cx={sunCx} cy={sunCy} r={sunR * 1.8} gradientUnits="userSpaceOnUse">
+          {/* Relative units (default): Android react-native-svg mis-renders
+              absolute-unit radial gradients as solid black. */}
+          <RadialGradient id={ids.glow} cx="50%" cy="50%" r="50%">
             <Stop offset="0" stopColor={colors.orange} stopOpacity="0.45" />
             <Stop offset="0.55" stopColor={colors.orangeHot} stopOpacity="0.12" />
             <Stop offset="1" stopColor={colors.orangeHot} stopOpacity="0" />
@@ -169,10 +171,6 @@ function RetroScene({ horizon = 0.5, speed = 'idle', accent = colors.orange }) {
             <Stop offset="0.3" stopColor={accent} stopOpacity="0.55" />
             <Stop offset="1" stopColor={accent} stopOpacity="0.95" />
           </LinearGradient>
-          <RadialGradient id={ids.vignette} cx={W / 2} cy={H * 0.45} r={Math.max(W, H) * 0.75} gradientUnits="userSpaceOnUse">
-            <Stop offset="0.55" stopColor="#000" stopOpacity="0" />
-            <Stop offset="1" stopColor="#000" stopOpacity="0.6" />
-          </RadialGradient>
         </Defs>
 
         {/* Sky + stars */}
@@ -224,7 +222,15 @@ function RetroScene({ horizon = 0.5, speed = 'idle', accent = colors.orange }) {
       </View>
 
       <Scanlines opacity={0.18} />
+      {/* Defs must live in the same <Svg> that uses them: on native each <Svg>
+          is its own canvas, and an unresolved url(#id) fill renders solid black. */}
       <Svg style={StyleSheet.absoluteFill} width={W} height={H}>
+        <Defs>
+          <RadialGradient id={ids.vignette} cx="50%" cy="45%" r="75%">
+            <Stop offset="0.55" stopColor="#000" stopOpacity="0" />
+            <Stop offset="1" stopColor="#000" stopOpacity="0.6" />
+          </RadialGradient>
+        </Defs>
         <Rect x="0" y="0" width={W} height={H} fill={`url(#${ids.vignette})`} />
       </Svg>
     </View>

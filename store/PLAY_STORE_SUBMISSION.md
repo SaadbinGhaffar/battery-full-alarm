@@ -22,8 +22,8 @@ this repo.
 
 | What | Where it is |
 | --- | --- |
-| App bundle (**.aab**) for production | `builds/Charged-v1.0.0-release.aab` |
-| Test APK (optional, for sideloading) | `builds/Charged-v1.0.0-preview.apk` |
+| App bundle (**.aab**) for production | `builds/Charged-1.0.0-vc5-release.aab` |
+| Test APK (optional, for sideloading) | `builds/Charged-1.0.0-preview.apk` |
 | Icon 512×512 | `store/icon-512.png` |
 | Feature graphic 1024×500 | `store/feature-graphic.png` |
 | Screenshots ×4 | `store/screenshots/` |
@@ -162,8 +162,8 @@ Justification to submit:
    you don't tap live ads.
 2. If on a personal account, run the required **Closed testing** (12 testers / 14 days).
 3. Then **Production → Create new release**:
-   - Upload `builds/Charged-v1.0.0-release.aab`.
-   - Release name: `1.0.0 (2)`.
+   - Upload `builds/Charged-1.0.0-vc5-release.aab`.
+   - Release name: `1.0.0 (5)`.
    - Release notes: e.g. "First release of Charged: Battery Full Alarm."
    - Review → **Start rollout to Production**.
 
