@@ -128,7 +128,7 @@
         <tr><th>Permission</th><th>Why it is used</th></tr>
         <tr><td>Notifications (POST_NOTIFICATIONS)</td><td>To alert you when your phone reaches the charge target.</td></tr>
         <tr><td>Vibrate</td><td>To vibrate during the alarm.</td></tr>
-        <tr><td>Foreground service</td><td>Optional "Exact background alerts" feature: keeps a battery monitor running so you are alerted the moment the target is reached, even when the App is closed. Off by default.</td></tr>
+        <tr><td>Foreground service</td><td>"Background alarm" feature: keeps a battery monitor running (with a visible notification) so the alarm rings the moment the target is reached, even when the App is closed. On by default; you can turn it off in Settings. Battery data never leaves your device.</td></tr>
         <tr><td>Run on device start (RECEIVE_BOOT_COMPLETED)</td><td>Used by the background-check component so monitoring can resume after a restart.</td></tr>
         <tr><td>Keep device awake (WAKE_LOCK)</td><td>Used to reliably deliver alerts and, if you enable it, keep the screen on while charging.</td></tr>
         <tr><td>Internet / network state</td><td>Required by the Google AdMob SDK to load ads.</td></tr>
