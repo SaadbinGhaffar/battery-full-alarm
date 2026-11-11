@@ -6,6 +6,12 @@ export const BACKGROUND_TASK_NAME = 'charged-battery-full-check';
 
 export const NOTIFICATION_CHANNEL_ID = 'battery-full';
 
+/** Silent channel used while the native alarm does the ringing (Android). */
+export const SILENT_CHANNEL_ID = 'charge-alert';
+
+/** Bump when a stored-settings migration is needed (see settingsStore). */
+export const SETTINGS_SCHEMA = 2;
+
 /** Bundled alarm file name (declared in app.json -> expo-notifications sounds). */
 export const ALARM_SOUND_FILE = 'alarm.wav';
 
@@ -20,7 +26,8 @@ export const DEFAULT_SETTINGS = {
   vibration: true, // vibrate while the alarm is active
   notification: true, // post a system notification
   keepAwake: false, // keep the screen on while charging (in-app)
-  exactBackground: false, // Android: persistent foreground-service monitor
+  exactBackground: true, // Android: foreground-service monitor, rings with the app closed
+  schema: SETTINGS_SCHEMA,
 };
 
 /** Foreground-service (exact background) polling interval, milliseconds. */

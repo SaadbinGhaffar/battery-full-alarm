@@ -1,39 +1,23 @@
 /**
- * Android foreground-service monitor for EXACT background timing.
+ * Android foreground-service monitor: rings the alarm the instant the charge
+ * target is reached, even with the app in the background or closed.
  *
- * react-native-background-actions keeps a persistent Android foreground service
- * alive (with its own ongoing notification) and runs this JS loop even when the
- * app is backgrounded or closed. The loop polls the battery every FG_POLL_MS and
- * fires the full-charge alert the instant the target is reached — no 15-minute
- * OS window like the background-fetch fallback.
- *
- * Coordination:
- *  - While the app is in the foreground, the in-app monitor owns the alarm, so the
- *    loop only refreshes its ongoing notification and skips the alert.
- *  - It shares the "already alerted this session" flag with the background-fetch
- *    task so the two never double-notify.
+ * react-native-background-actions keeps a foreground service alive (with its
+ * own ongoing notification), which keeps this JS loop — and the native alarm —
+ * running in the background. The loop reacts to battery level broadcasts and
+ * also polls every FG_POLL_MS as a backstop, handing every reading to the shared
+ * alert logic (services/chargeAlert), which dedupes against the open app.
  *
  * Android-only. iOS has no equivalent long-running background path and keeps the
  * best-effort expo-background-task net instead.
  */
-import { AppState, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import * as Battery from 'expo-battery';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import {
-  STORAGE_KEY,
-  DEFAULT_SETTINGS,
-  FG_POLL_MS,
-  FG_SERVICE_TYPES,
-} from '../constants';
-import {
-  presentFullChargeNotification,
-  setupNotificationChannel,
-} from './notifications';
-import {
-  markBackgroundAlerted,
-  resetBackgroundAlertFlag,
-} from './backgroundTask';
+import { FG_POLL_MS, FG_SERVICE_TYPES } from '../constants';
+import { handleBatteryReading, isPlugged, isTargetReached } from './chargeAlert';
+import { setupNotificationChannel } from './notifications';
+import { loadSettings } from './settingsStore';
 
 // Lazy, guarded require: the native module is absent in Expo Go / on web, and we
 // never want importing this file to crash those environments.
@@ -44,97 +28,80 @@ try {
   BackgroundService = null;
 }
 
-const REARM_MARGIN = 3;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Is the exact-background path usable on this platform/runtime? */
+/** Is the background monitor usable on this platform/runtime? */
 export function isForegroundMonitorAvailable() {
   return Platform.OS === 'android' && !!BackgroundService;
 }
 
-export function isForegroundMonitorRunning() {
+function serviceRunning() {
   try {
-    return isForegroundMonitorAvailable() && BackgroundService.isRunning();
+    return !!BackgroundService && BackgroundService.isRunning();
   } catch {
     return false;
   }
 }
 
-async function readSettings() {
-  try {
-    const raw = await AsyncStorage.getItem(STORAGE_KEY);
-    return raw ? { ...DEFAULT_SETTINGS, ...JSON.parse(raw) } : DEFAULT_SETTINGS;
-  } catch {
-    return DEFAULT_SETTINGS;
+/** Keep the persistent service notification informative and live. */
+function describe(percent, state, threshold) {
+  if (!isPlugged(state)) {
+    return { taskTitle: 'Charge alarm armed', taskDesc: `Battery ${percent}% • plug in to monitor` };
   }
-}
-
-function isPlugged(state) {
-  return (
-    state === Battery.BatteryState.CHARGING ||
-    state === Battery.BatteryState.FULL ||
-    state === Battery.BatteryState.NOT_CHARGING
-  );
+  if (isTargetReached(percent, state, threshold)) {
+    return { taskTitle: 'Target reached — unplug now', taskDesc: `Battery ${percent}% • target ${threshold}%` };
+  }
+  return { taskTitle: 'Charged is watching your battery', taskDesc: `Battery ${percent}% • alarm at ${threshold}%` };
 }
 
 // The long-running task. Exits (resolves) when monitoring is turned off or the
 // service is stopped, which lets the OS release the service.
 const monitorTask = async () => {
-  let alerted = false;
+  let settings = await loadSettings();
+  let lastDesc = '';
 
-  while (BackgroundService && BackgroundService.isRunning()) {
-    try {
-      const settings = await readSettings();
-      if (!settings.enabled || !settings.exactBackground) break;
-
-      const [level, state] = await Promise.all([
-        Battery.getBatteryLevelAsync(),
-        Battery.getBatteryStateAsync(),
-      ]);
-      const percent = Math.round(level * 100);
-      const plugged = isPlugged(state);
-      const reached =
-        state === Battery.BatteryState.FULL || percent >= settings.threshold;
-
-      // Keep the persistent service notification informative and live.
-      const title = !plugged
-        ? 'On battery'
-        : reached
-        ? 'Fully charged'
-        : 'Charging';
-      const desc = plugged
-        ? `Battery ${percent}% • target ${settings.threshold}%`
-        : `Battery ${percent}% • plug in to monitor`;
-      BackgroundService.updateNotification({ taskTitle: title, taskDesc: desc }).catch(
-        () => {}
-      );
-
-      if (plugged && reached && !alerted) {
-        alerted = true;
-        // When the app is open, the in-app alarm handles it — avoid a duplicate.
-        if (AppState.currentState !== 'active') {
-          await setupNotificationChannel({ sound: settings.sound });
-          await presentFullChargeNotification({
-            percent,
-            threshold: settings.threshold,
-            sound: settings.sound,
-          });
-        }
-        await markBackgroundAlerted();
-      }
-
-      // Re-arm for the next session once unplugged / dropped below target.
-      if (!plugged || percent < settings.threshold - REARM_MARGIN) {
-        if (alerted) {
-          alerted = false;
-          await resetBackgroundAlertFlag();
-        }
-      }
-    } catch {
-      // transient read error — keep looping
+  const check = async (level, state) => {
+    const percent = Math.round(level * 100);
+    const desc = describe(percent, state, settings.threshold);
+    if (desc.taskTitle + desc.taskDesc !== lastDesc) {
+      lastDesc = desc.taskTitle + desc.taskDesc;
+      BackgroundService.updateNotification(desc).catch(() => {});
     }
+    await handleBatteryReading({ percent, state, settings });
+  };
 
-    await sleep(FG_POLL_MS);
+  // Battery broadcasts wake us the moment the level or plug state changes
+  // (unplugging stops a ringing alarm right away).
+  const recheck = () => {
+    Promise.all([Battery.getBatteryLevelAsync(), Battery.getBatteryStateAsync()])
+      .then(([level, state]) => check(level, state))
+      .catch(() => {});
+  };
+  const subs = [];
+  try {
+    subs.push(Battery.addBatteryLevelListener(recheck));
+    subs.push(Battery.addBatteryStateListener(recheck));
+  } catch {
+    // no emitter — the poll below still covers it
+  }
+
+  try {
+    while (serviceRunning()) {
+      try {
+        settings = await loadSettings();
+        if (!settings.enabled || !settings.exactBackground) break;
+        const [level, state] = await Promise.all([
+          Battery.getBatteryLevelAsync(),
+          Battery.getBatteryStateAsync(),
+        ]);
+        await check(level, state);
+      } catch {
+        // transient read error — keep looping
+      }
+      await sleep(FG_POLL_MS);
+    }
+  } finally {
+    subs.forEach((sub) => sub?.remove());
   }
 };
 
@@ -142,13 +109,13 @@ const monitorTask = async () => {
 export async function startForegroundMonitor() {
   if (!isForegroundMonitorAvailable()) return false;
   try {
-    if (BackgroundService.isRunning()) return true;
+    if (serviceRunning()) return true;
     await setupNotificationChannel();
     await BackgroundService.start(monitorTask, {
       taskName: 'ChargedMonitor',
       taskTitle: 'Charged is watching your battery',
       taskDesc: 'Monitoring charge level…',
-      taskIcon: { name: 'ic_launcher', type: 'mipmap' },
+      taskIcon: { name: 'notification_icon', type: 'drawable' },
       color: '#FF5A00',
       linkingURI: 'charged://',
       foregroundServiceType: FG_SERVICE_TYPES,
@@ -163,7 +130,7 @@ export async function startForegroundMonitor() {
 export async function stopForegroundMonitor() {
   if (!isForegroundMonitorAvailable()) return;
   try {
-    if (BackgroundService.isRunning()) await BackgroundService.stop();
+    if (serviceRunning()) await BackgroundService.stop();
   } catch {
     // ignore
   }

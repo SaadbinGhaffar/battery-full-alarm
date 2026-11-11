@@ -7,8 +7,8 @@ your phone finishes charging**, so you can unplug it and keep your battery healt
 - 🔔 Looping alarm sound + vibration + system notification when the target is hit
 - 🎯 Configurable charge target: **80% / 90% / 100%** (lower targets extend battery lifespan)
 - 🌅 **Retro 80s synthwave UI** — see below
-- 🛡️ Two background strategies: a best-effort net (all platforms) **plus** an optional
-  **Android foreground service for exact, to-the-second alerts** even when the app is closed
+- ⏰ A **real alarm** on Android: rings on the alarm volume (even in silent mode) with the app
+  closed or the screen off, via a foreground-service monitor + a native alarm player
 
 ---
 
@@ -123,11 +123,12 @@ One-time AdMob console setup (only you can do these):
 
 | Concern | Implementation |
 | --- | --- |
-| **Battery state** | `src/hooks/useBatteryMonitor.js` subscribes to `expo-battery` level + state listeners, re‑checks on app foreground, and fires `onReachTarget` once per session with hysteresis. |
-| **Alarm** | `src/providers/AlarmProvider.js` owns an `expo-audio` looping player (plays in silent mode) + a repeating `Vibration` pattern. |
-| **Notifications** | `src/services/notifications.js` sets up a MAX‑importance Android channel with the bundled `alarm.wav` and posts the alert. |
-| **Background (fallback)** | `src/services/backgroundTask.js` registers an `expo-background-task` that checks the battery when the OS wakes the app (~15 min) and notifies if the target is met. Used on iOS and when exact mode is off. |
-| **Exact background (Android)** | `src/services/foregroundService.js` + `plugins/withBatteryForegroundService.js` run a persistent `react-native-background-actions` foreground service that polls every 15s and alerts the instant the target is hit — even with the app closed. |
+| **Battery state** | `src/hooks/useBatteryMonitor.js` subscribes to `expo-battery` level + state listeners and re‑checks on app foreground. |
+| **When to ring** | `src/services/chargeAlert.js` is the single decision point. Every reader (open app, foreground service, background task) feeds readings in; it rings once per charging session, re‑arms on unplug / drop below target, and stops the alarm when you unplug. |
+| **Alarm** | `src/services/alarm.js`. On Android it drives the local native module `modules/charged-alarm` (MediaPlayer on the **ALARM** stream with a wake lock, alarm‑usage vibration, 10‑min safety stop). Elsewhere it falls back to `expo-audio` + `Vibration`. `AlarmProvider` mirrors its state for the UI. |
+| **Notifications** | `src/services/notifications.js`: channel setup, a **STOP ALARM** action button, and the alert. On Android the alert channel is silent because the native alarm does the ringing. |
+| **Background (fallback)** | `src/services/backgroundTask.js` registers an `expo-background-task` that checks the battery when the OS wakes the app (~15 min). Used on iOS and when the background alarm is off. |
+| **Background alarm (Android)** | `src/services/foregroundService.js` + `plugins/withBatteryForegroundService.js` run a `react-native-background-actions` foreground service that listens for battery broadcasts (plus a 15s poll) so the alarm rings the instant the target is hit, even with the app closed. On by default. |
 | **Settings** | `src/hooks/useSettings.js` persists preferences in AsyncStorage via React context. |
 | **UI** | Retro primitives in `src/components/retro/` (`RetroScene`, `RetroText`, `PixelBattery`, `ArcadeButton`, `RetroSwitch`, `Marquee`, …) composed by `HomeScreen`, `SettingsModal` and `AlarmOverlay`, themed from `src/theme/index.js`. |
 
@@ -188,24 +189,27 @@ this with two layers:
 1. **Best-effort net (all platforms, always on).** `expo-background-task` lets the OS wake the
    app periodically (Android ≈ every 15 min minimum; iOS at its discretion). Zero battery cost,
    but a background alert can arrive a little after the exact moment.
-2. **Exact background alerts (Android, opt-in).** Toggle **Settings → Background → "Exact
-   background alerts"** to run a persistent **foreground service** that polls the battery every
-   15 seconds and fires the alert the instant you hit the target — even with the app closed. It
-   shows an ongoing "Charged is watching your battery" notification (Android requires this for
-   foreground services) and uses a little more battery. When the app is open, it steps aside and
-   lets the in-app alarm handle things, and it shares a dedupe flag with the other paths so you
-   never get a double alert.
+2. **Background alarm (Android, on by default).** **Settings → Background → "Background
+   alarm"** runs a **foreground service** that reacts to battery broadcasts (plus a 15-second
+   poll) and rings the native alarm the instant you hit the target, even with the app closed or
+   the screen off. It shows an ongoing "Charged is watching your battery" notification (Android
+   requires this for foreground services). All readers go through `chargeAlert.js`, so you never
+   get a double alarm.
 
-> **iOS note:** iOS has no equivalent to a long-running foreground service, so exact mode is
-> Android-only. iOS relies on strategy #1.
+> **iOS note:** iOS has no equivalent to a long-running foreground service, so the background alarm
+> is Android-only. iOS relies on strategy #1.
 
-### How "exact mode" is wired (native)
+### How the background alarm is wired (native)
 
 - `react-native-background-actions@4` provides the Android foreground service.
 - `plugins/withBatteryForegroundService.js` is a custom Expo config plugin that sets the
   service's `android:foregroundServiceType="specialUse"` (required on Android 14+) via the
   manifest merger (`tools:replace`) and adds the `FOREGROUND_SERVICE_SPECIAL_USE` permission.
 - The runtime passes `foregroundServiceType: ['specialUse']` to match the manifest.
+- `modules/charged-alarm` is a local Expo module (autolinked from `modules/`) whose Kotlin
+  `AlarmPlayer` plays `res/raw/alarm.wav` (copied there by the expo-notifications plugin) on the
+  alarm stream. `expo-audio`'s background playback service is disabled, so the app declares no
+  `mediaPlayback` foreground service.
 
 > `react-native-background-actions` is listed as "untested on the New Architecture" in the React
 > Native Directory. It's a simple legacy bridge module and runs fine through RN 0.88's New Arch
@@ -231,11 +235,14 @@ Battery_Charger_Notification/
     │   ├── useBatteryMonitor.js   # Real-time detection core
     │   ├── useReducedMotion.js    # OS "reduce motion" setting
     │   └── useSvgId.js            # Collision-free SVG def ids
-    ├── providers/AlarmProvider.js # Looping audio + vibration
+    ├── providers/AlarmProvider.js # Alarm state for the UI
     ├── services/
-    │   ├── notifications.js        # Permissions, channel, alert
-    │   ├── backgroundTask.js       # Best-effort background net + dedupe flag
-    │   └── foregroundService.js    # Exact Android background monitor
+    │   ├── alarm.js                # The alarm (native on Android, expo-audio fallback)
+    │   ├── chargeAlert.js          # When to ring: once per session, unplug stops
+    │   ├── settingsStore.js        # Settings outside React + migrations
+    │   ├── notifications.js        # Permissions, channels, STOP action, alert
+    │   ├── backgroundTask.js       # Best-effort background net
+    │   └── foregroundService.js    # Android background alarm monitor
     ├── components/
     │   ├── retro/                  # Scene, text, panel, buttons, switch, battery, ticker…
     │   ├── SettingsModal.js        # Retro settings window

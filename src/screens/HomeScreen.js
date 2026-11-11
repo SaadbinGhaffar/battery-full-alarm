@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -9,18 +9,10 @@ import { colors, spacing, type } from '../theme';
 import { useSettings } from '../hooks/useSettings';
 import { useBatteryMonitor } from '../hooks/useBatteryMonitor';
 import { useAlarm } from '../providers/AlarmProvider';
-import {
-  ensureNotificationPermission,
-  setupNotificationChannel,
-  presentFullChargeNotification,
-  clearDeliveredNotifications,
-} from '../services/notifications';
-import {
-  registerBackgroundTask,
-  resetBackgroundAlertFlag,
-  markBackgroundAlerted,
-} from '../services/backgroundTask';
+import { ensureNotificationPermission, setupNotificationChannel } from '../services/notifications';
+import { registerBackgroundTask } from '../services/backgroundTask';
 import { startForegroundMonitor, stopForegroundMonitor } from '../services/foregroundService';
+import { dismissChargeAlarm, handleBatteryReading, resetChargeSession } from '../services/chargeAlert';
 
 import RetroScene from '../components/retro/RetroScene';
 import RetroText from '../components/retro/RetroText';
@@ -84,60 +76,56 @@ function Stat({ label, value, color }) {
 
 export default function HomeScreen() {
   const { width } = useWindowDimensions();
-  const { settings, update } = useSettings();
-  const { isAlarming, start, stop } = useAlarm();
+  const { settings, update, hydrated } = useSettings();
+  const { isAlarming, alarmPercent, start } = useAlarm();
 
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [lastPercent, setLastPercent] = useState(0);
 
-  // Fired once per charging session when the target is reached.
-  const onReachTarget = useCallback(
-    async ({ percent }) => {
-      setLastPercent(percent);
-      start({ sound: settings.sound, vibration: settings.vibration });
-      // Mark this session alerted so the background paths don't double-notify.
-      markBackgroundAlerted();
-      if (settings.notification) {
-        await setupNotificationChannel({ sound: settings.sound });
-        await presentFullChargeNotification({
-          percent,
-          threshold: settings.threshold,
-          sound: settings.sound,
-        });
-      }
+  // Every live reading goes to the shared alert logic, which rings once per
+  // charging session (deduped against the background monitor).
+  const onReading = useCallback(
+    ({ percent: p, state }) => {
+      if (hydrated) handleBatteryReading({ percent: p, state, settings });
     },
-    [settings.sound, settings.vibration, settings.notification, settings.threshold, start]
+    [hydrated, settings]
   );
 
-  const { percent, batteryState, pluggedIn, charging, full, notCharging, lowPowerMode, rearm } =
-    useBatteryMonitor({
-      threshold: settings.threshold,
-      enabled: settings.enabled,
-      onReachTarget,
-    });
+  const { percent, batteryState, pluggedIn, charging, full, notCharging, lowPowerMode, refresh } =
+    useBatteryMonitor({ onReading });
+
+  // Evaluate once settings load. Later, a new target or re-enabled monitoring
+  // starts a fresh session (e.g. picking 80% while already at 85% rings), but
+  // the first load must not — or reopening the app would ring again.
+  const sessionKeyRef = useRef(null);
+  useEffect(() => {
+    if (!hydrated) return;
+    const key = `${settings.threshold}:${settings.enabled}`;
+    if (sessionKeyRef.current !== null && sessionKeyRef.current !== key) resetChargeSession();
+    sessionKeyRef.current = key;
+    refresh();
+  }, [hydrated, settings.threshold, settings.enabled, refresh]);
 
   // One-time setup: notification permission + channel + background task.
   useEffect(() => {
     (async () => {
       await ensureNotificationPermission();
       await setupNotificationChannel({ sound: settings.sound });
-      if (settings.enabled && settings.notification) {
-        await registerBackgroundTask();
-      }
+      await registerBackgroundTask();
     })();
     // run once on mount
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Start/stop the Android foreground-service monitor for exact background timing.
+  // Start/stop the Android foreground-service monitor (rings with the app closed).
+  // Wait for stored settings so we never start it on defaults by mistake.
   useEffect(() => {
-    if (Platform.OS !== 'android') return;
+    if (Platform.OS !== 'android' || !hydrated) return;
     if (settings.enabled && settings.exactBackground) {
       startForegroundMonitor();
     } else {
       stopForegroundMonitor();
     }
-  }, [settings.enabled, settings.exactBackground]);
+  }, [hydrated, settings.enabled, settings.exactBackground]);
 
   // Keep the screen awake while plugged in, if enabled. Only release a wake lock
   // this effect actually took — releasing an inactive tag throws.
@@ -153,16 +141,18 @@ export default function HomeScreen() {
     };
   }, [settings.keepAwake, pluggedIn]);
 
-  const dismissAlarm = useCallback(() => {
-    stop();
-    rearm();
-    clearDeliveredNotifications();
-    resetBackgroundAlertFlag();
-  }, [stop, rearm]);
+  // Stopping silences the alarm; it won't ring again until the next charge
+  // session (unplug, or the level drops below the target).
+  const dismissAlarm = dismissChargeAlarm;
 
   const handleTest = useCallback(() => {
-    setLastPercent(percent ?? 100);
-    start({ sound: settings.sound, vibration: settings.vibration });
+    start({
+      sound: settings.sound,
+      vibration: settings.vibration,
+      percent: percent ?? 100,
+      title: '🔔 Test alarm',
+      body: 'This is how Charged alerts you. Tap STOP ALARM to silence it.',
+    });
   }, [percent, settings.sound, settings.vibration, start]);
 
   // ---- Derived display state -------------------------------------------------
@@ -268,7 +258,7 @@ export default function HomeScreen() {
         update={update}
       />
 
-      <AlarmOverlay visible={isAlarming} percent={lastPercent} threshold={settings.threshold} onDismiss={dismissAlarm} />
+      <AlarmOverlay visible={isAlarming} percent={alarmPercent ?? percent ?? 100} threshold={settings.threshold} onDismiss={dismissAlarm} />
     </View>
   );
 }

@@ -32,7 +32,7 @@ Keeping a lithium-ion battery stuck at 100% wears it out faster. CHARGED lets yo
 Choose 80%, 90%, or 100%. Lower targets are gentler on your battery and help it last for more years.
 
 ★ WORKS IN THE BACKGROUND
-Turn on Exact Alerts (Android) and CHARGED keeps watching your battery even when the app is closed, so the alarm fires right on time. Prefer to save power? Leave it off and the app still checks in the background.
+The Background Alarm (Android, on by default) keeps watching your battery even when the app is closed or the screen is off, and rings on your alarm volume, even in silent mode. Unplug the charger or tap STOP to silence it.
 
 ★ RETRO BY DESIGN
 Glowing neon grid, pixel fonts, an arcade-style interface, and a sunset that would make any synthwave fan smile. Battery alarms don't have to be boring.
@@ -66,7 +66,7 @@ CHARGED is ad-supported. Ads are provided by Google AdMob.
 
 ## Privacy Policy URL  (required)
 ```
-https://saadbinghaffar.github.io/battery-full-alarm/privacy-policy.html
+https://saadbinghaffar.github.io/battery-full-alarm/privacy.html
 ```
 
 ## Graphics (upload from the /store folder)

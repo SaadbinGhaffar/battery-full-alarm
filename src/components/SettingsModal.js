@@ -100,8 +100,8 @@ export default function SettingsModal({ visible, onClose, settings, update }) {
             {Platform.OS === 'android' && (
               <Section title="BACKGROUND">
                 <ToggleRow
-                  title="EXACT ALERTS"
-                  subtitle="Persistent monitor: alerts the instant you hit the target, even with the app closed. Uses a bit more battery."
+                  title="BACKGROUND ALARM"
+                  subtitle="Rings the moment you hit the target, even with the app closed or the screen off. Shows a small ongoing notification."
                   value={settings.exactBackground}
                   onChange={set('exactBackground')}
                   last
@@ -123,7 +123,7 @@ export default function SettingsModal({ visible, onClose, settings, update }) {
 
             <Text style={styles.footnote}>
               {Platform.OS === 'android'
-                ? 'CHARGED watches your battery live while open. With exact alerts on, a foreground service keeps checking after you close the app. Otherwise the system wakes the app every ~15 min, so a background alert may arrive a little late.'
+                ? 'The alarm rings on your ALARM volume, even in silent mode. Unplug the charger or tap STOP to silence it. With the background alarm off, CHARGED can only send a notification when closed, and it may arrive up to ~15 min late.'
                 : 'CHARGED watches your battery live while open. In the background the system wakes the app every so often, so a background alert may arrive a little late.'}
             </Text>
           </ScrollView>

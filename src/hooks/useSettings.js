@@ -10,9 +10,8 @@ import React, {
   useState,
   useCallback,
 } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import { STORAGE_KEY, DEFAULT_SETTINGS } from '../constants';
+import { DEFAULT_SETTINGS } from '../constants';
+import { loadSettings, saveSettings } from '../services/settingsStore';
 
 const SettingsContext = createContext(null);
 
@@ -24,15 +23,10 @@ export function SettingsProvider({ children }) {
   useEffect(() => {
     let active = true;
     (async () => {
-      try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
-        if (active && raw) {
-          setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(raw) });
-        }
-      } catch {
-        // fall back to defaults
-      } finally {
-        if (active) setHydrated(true);
+      const stored = await loadSettings();
+      if (active) {
+        setSettings(stored);
+        setHydrated(true);
       }
     })();
     return () => {
@@ -43,7 +37,7 @@ export function SettingsProvider({ children }) {
   const update = useCallback((patch) => {
     setSettings((prev) => {
       const next = { ...prev, ...patch };
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next)).catch(() => {});
+      saveSettings(next);
       return next;
     });
   }, []);

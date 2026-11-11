@@ -22,7 +22,7 @@ this repo.
 
 | What | Where it is |
 | --- | --- |
-| App bundle (**.aab**) for production | `builds/Charged-1.0.0-vc3-release.aab` |
+| App bundle (**.aab**) for production | `builds/Charged-1.0.0-vc5-release.aab` |
 | Test APK (optional, for sideloading) | `builds/Charged-1.0.0-preview.apk` |
 | Icon 512×512 | `store/icon-512.png` |
 | Feature graphic 1024×500 | `store/feature-graphic.png` |
@@ -39,7 +39,7 @@ The policy must be a public URL. Enable Pages once:
 2. Under **Build and deployment → Source**, choose **Deploy from a branch**.
 3. Branch: **main**, folder: **/docs** → **Save**.
 4. Wait ~1 minute. Your URLs become:
-   - Privacy policy: `https://saadbinghaffar.github.io/battery-full-alarm/privacy-policy.html`
+   - Privacy policy: `https://saadbinghaffar.github.io/battery-full-alarm/privacy.html`
    - Landing/support: `https://saadbinghaffar.github.io/battery-full-alarm/`
    - app-ads.txt: `https://saadbinghaffar.github.io/battery-full-alarm/app-ads.txt`
 
@@ -69,7 +69,7 @@ Paste everything from `store/play-store-listing.md` and upload the graphics from
 ## 5. App content / policy forms **[you]**
 
 ### 5a. Privacy policy
-Paste: `https://saadbinghaffar.github.io/battery-full-alarm/privacy-policy.html`
+Paste: `https://saadbinghaffar.github.io/battery-full-alarm/privacy.html`
 
 ### 5b. Ads
 - "Does your app contain ads?" → **Yes**.
@@ -122,29 +122,28 @@ Declare these data types (all collected by Google AdMob):
 
 ## 7. ⚠️ Foreground service declarations (most likely rejection point) **[you]**
 
-The app declares two foreground-service types. Play Console → **App content → Foreground service
-permissions** will ask you to justify each. Use the text below.
+From version code 4 the app declares **one** foreground-service type, `specialUse`. The alarm now
+plays through a native alarm player, so `FOREGROUND_SERVICE_MEDIA_PLAYBACK` is gone: if Play still
+lists it from an older bundle, it disappears once the new bundle replaces the old one.
 
-### 7a. `FOREGROUND_SERVICE_SPECIAL_USE`  — from the "Exact Alerts" feature
-Justification to submit:
-> "The app is a battery-full alarm. When the user enables 'Exact Alerts', a foreground service
-> polls the device battery level so it can notify the user the instant the battery reaches their
-> chosen charge target (e.g. 100%), even while the app is in the background. This continuous
-> battery monitoring does not fit any of the other defined foreground-service types."
+### 7a. `FOREGROUND_SERVICE_SPECIAL_USE`  — the "Background alarm" feature
+- Tasks: tick **Other**.
+- Video link: a YouTube (Unlisted) recording. Plug in, set the target 1% above the current level,
+  show Settings → BACKGROUND ALARM on, press Home, pull down the shade to show
+  "Charged is watching your battery", then wait for the alarm to ring and tap STOP ALARM.
+- Description to submit:
+> "Charged is a battery-full alarm. While the phone charges, a foreground service with an
+> always-visible notification watches the battery level and rings an alarm the moment it reaches
+> the user's chosen target (80/90/100%), even with the app closed or the screen off. It must start
+> immediately and run continuously: if paused or deferred (WorkManager runs at most every
+> 15 minutes), the target would be missed and the phone would keep overcharging. The feature is
+> user-facing and can be turned off anytime in Settings."
 
 > **Heads-up:** `specialUse` requires Google review and is sometimes rejected because it's meant
-> only for cases that fit no other type. **This feature is optional and OFF by default.** If Google
-> rejects the declaration, the quickest fix is to **remove the exact-background feature** and rely
-> on the built-in periodic background check + notifications (no special permission needed). It's a
-> small, isolated change: remove `src/services/foregroundService.js`, the
-> `plugins/withBatteryForegroundService.js` plugin (and its entry in `app.json`), the two
-> `FOREGROUND_SERVICE*` permissions in `app.json`, and the "Exact alerts" toggle in Settings, then
-> rebuild. Ask the assistant to "remove the foreground-service path" and it will handle it.
-
-### 7b. `FOREGROUND_SERVICE_MEDIA_PLAYBACK`  — from audio playback (expo-audio)
-Justification to submit:
-> "The app plays an alarm sound when the phone finishes charging. The media-playback foreground
-> service lets the alarm continue to sound reliably if the user switches apps while it is ringing."
+> only for cases that fit no other type. If Google rejects it, the fallback is to remove the
+> background alarm and rely on the periodic background check + notifications (no special
+> permission, but no ringing while the app is closed). Ask the assistant to "remove the
+> foreground-service path".
 
 ---
 
@@ -166,8 +165,8 @@ Justification to submit:
    you don't tap live ads.
 2. If on a personal account, run the required **Closed testing** (12 testers / 14 days).
 3. Then **Production → Create new release**:
-   - Upload `builds/Charged-1.0.0-vc3-release.aab`.
-   - Release name: `1.0.0 (3)`.
+   - Upload `builds/Charged-1.0.0-vc5-release.aab`.
+   - Release name: `1.0.0 (5)`.
    - Release notes: e.g. "First release of Charged: Battery Full Alarm."
    - Review → **Start rollout to Production**.
 
@@ -187,5 +186,5 @@ Justification to submit:
 - AdMob App ID (Android): `ca-app-pub-2685624187820858~3600318632`
 - Banner unit: `ca-app-pub-2685624187820858/2314147961`
 - Native unit: `ca-app-pub-2685624187820858/5927099079`
-- Privacy policy: `https://saadbinghaffar.github.io/battery-full-alarm/privacy-policy.html`
+- Privacy policy: `https://saadbinghaffar.github.io/battery-full-alarm/privacy.html`
 - Repo: `https://github.com/SaadbinGhaffar/battery-full-alarm`
