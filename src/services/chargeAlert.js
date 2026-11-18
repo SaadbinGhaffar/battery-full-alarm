@@ -24,6 +24,7 @@ import {
   presentFullChargeNotification,
   setupNotificationChannel,
 } from './notifications';
+import { noteChargeSuccess } from './reviewPrompt';
 
 const ALERTED_KEY = '@charged/last-bg-alert';
 // Hysteresis so a battery hovering at the threshold doesn't re-trigger.
@@ -56,6 +57,8 @@ async function fireChargeAlert({ percent, settings }) {
   } catch {
     // storage unavailable — the in-memory flag still prevents repeats
   }
+
+  noteChargeSuccess();
 
   const message = chargeMessage({ percent, threshold: settings.threshold });
   startAlarm({

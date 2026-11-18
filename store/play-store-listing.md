@@ -4,54 +4,21 @@ Copy/paste these into **Play Console → Main store listing**. Character limits 
 
 ---
 
-## App name  (max 30)
-```
-Charged: Battery Full Alarm
-```
-*(27 chars. Alternatives: "Charged – Battery Alarm", "Charged: Full Battery Alarm")*
+## Listing text (title, short and full description)
 
-## Short description  (max 80)
-```
-Retro alarm that alerts you the moment your phone hits a full charge. Unplug!
-```
-*(76 chars.)*
+The text lives in **`store/listing/<locale>/`**, one folder per language, one file per field:
 
-## Full description  (max 4000)
-```
-Ever left your phone charging overnight or forgotten it plugged in all day? CHARGED is a retro, 80s-style battery alarm that rings the moment your phone reaches a full charge — so you can unplug it and keep your battery healthy.
+| File | Play Console field | Limit |
+| --- | --- | --- |
+| `title.txt` | App name | 30 |
+| `short_description.txt` | Short description | 80 |
+| `full_description.txt` | Full description | 4000 |
 
-Keeping a lithium-ion battery stuck at 100% wears it out faster. CHARGED lets you choose when to be alerted — 80%, 90%, or 100% — so you can stop charging at the sweet spot and make your battery last longer.
+Locales: en-US (default), es-419, pt-BR, hi-IN, id, tr-TR, ru-RU, vi, ar, fr-FR, de-DE.
+Run `npm run listing:check` after any edit; it fails if a field is over Play's limit.
 
-★ WHAT IT DOES
-• Sounds a loud, looping alarm the instant your phone hits your chosen charge level
-• Alerts with sound + vibration + a notification so you never miss it
-• Big, bold "CHARGE COMPLETE!" screen with a one-tap STOP button
-• A live, retro synthwave battery monitor you'll actually want to look at
-
-★ PICK YOUR TARGET
-Choose 80%, 90%, or 100%. Lower targets are gentler on your battery and help it last for more years.
-
-★ WORKS IN THE BACKGROUND
-The Background Alarm (Android, on by default) keeps watching your battery even when the app is closed or the screen is off, and rings on your alarm volume, even in silent mode. Unplug the charger or tap STOP to silence it.
-
-★ RETRO BY DESIGN
-Glowing neon grid, pixel fonts, an arcade-style interface, and a sunset that would make any synthwave fan smile. Battery alarms don't have to be boring.
-
-★ SIMPLE & PRIVATE
-• No sign-up, no account, no personal details required
-• Your battery data and settings stay on your device
-• Just install, set your target, and relax
-
-★ GREAT FOR
-• Protecting battery health and extending battery lifespan
-• Overnight charging without overcharging
-• Anyone who forgets their phone on the charger
-• Fans of retro, synthwave, and pixel-art design
-
-Set it once and let CHARGED handle the rest. Your battery will thank you.
-
-CHARGED is ad-supported. Ads are provided by Google AdMob.
-```
+**To add a translation in Play Console:** Grow → Store presence → Main store listing →
+Manage translations → Add your own translations → pick the language → paste the three files.
 
 ---
 

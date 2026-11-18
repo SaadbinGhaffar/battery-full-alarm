@@ -1,0 +1,1 @@
+Battery full alarm & charge alert at 80%, 90% or 100%. Protect battery health.

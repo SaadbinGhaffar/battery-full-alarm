@@ -1,0 +1,33 @@
+CHARGED is a battery full alarm that rings the moment your phone reaches the charge level you choose: 80%, 90% or 100%. Unplug on time, stop overcharging and protect your battery health.
+
+Leaving a phone on the charger at 100% for hours wears out a lithium-ion battery faster. A charge limit of 80% or 90% is gentler and helps the battery last longer. CHARGED gives you a loud full charge alert as soon as you hit your target, so you know exactly when to unplug.
+
+★ A BATTERY FULL ALARM YOU WON'T MISS
+• Loud, looping charging alarm the instant your battery reaches your target
+• Sound, vibration and a notification, even when the phone is on silent
+• Big "CHARGE COMPLETE!" screen with a one-tap STOP button
+• Unplug the charger and the alarm stops by itself
+
+★ SET YOUR CHARGE LIMIT: 80%, 90% OR 100%
+Choose when the battery alarm rings. An 80% or 90% charge limit reduces battery wear. 100% alerts you at full charge.
+
+★ WORKS IN THE BACKGROUND
+The background alarm keeps watching your battery level while the app is closed or the screen is off, with a small notification while it watches. Stop the alarm right from the notification, even on the lock screen.
+
+★ RETRO BY DESIGN
+Neon synthwave grid, pixel fonts and an arcade-style battery monitor. A charging alarm doesn't have to look boring.
+
+★ SIMPLE AND PRIVATE
+• No sign-up and no account
+• Your battery data and settings stay on your device
+• Install it, pick your target, done
+
+★ GREAT FOR
+• Protecting battery health and extending battery life
+• Overnight charging without overcharging
+• Fast chargers that fill the battery quickly
+• Anyone who forgets their phone on the charger
+
+Plug in, set your charge alert, and let CHARGED tell you when to unplug.
+
+CHARGED is free and ad-supported. Ads are provided by Google AdMob.

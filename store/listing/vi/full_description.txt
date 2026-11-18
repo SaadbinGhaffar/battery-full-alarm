@@ -1,0 +1,33 @@
+CHARGED là ứng dụng báo động pin đầy, đổ chuông ngay khi điện thoại sạc đến mức bạn chọn: 80%, 90% hoặc 100%. Rút sạc đúng lúc, tránh sạc quá mức và bảo vệ sức khỏe pin.
+
+Để điện thoại cắm sạc ở 100% hàng giờ liền khiến pin lithium-ion chai nhanh hơn. Giới hạn sạc 80% hoặc 90% nhẹ nhàng hơn cho pin và giúp pin bền lâu hơn. CHARGED báo sạc đầy thật to ngay khi đạt mục tiêu, để bạn biết chính xác lúc nào cần rút sạc.
+
+★ BÁO ĐỘNG PIN ĐẦY KHÔNG THỂ BỎ LỠ
+• Chuông báo sạc to, lặp lại ngay khi pin đạt mục tiêu
+• Âm thanh, rung và thông báo, kể cả khi máy ở chế độ im lặng
+• Màn hình lớn "CHARGE COMPLETE!" với nút STOP một chạm
+• Rút sạc là chuông tự tắt
+
+★ CHỌN GIỚI HẠN SẠC: 80%, 90% HOẶC 100%
+Chọn thời điểm báo động pin đổ chuông. Giới hạn 80% hoặc 90% giúp giảm chai pin. 100% báo khi pin đầy.
+
+★ HOẠT ĐỘNG NGẦM
+Báo động chạy ngầm vẫn theo dõi mức pin khi ứng dụng đã đóng hoặc màn hình tắt, kèm một thông báo nhỏ trong lúc theo dõi. Tắt chuông ngay từ thông báo, kể cả trên màn hình khóa.
+
+★ THIẾT KẾ RETRO
+Lưới neon synthwave, phông chữ pixel và đồng hồ pin phong cách arcade. Báo sạc không cần phải nhàm chán.
+
+★ ĐƠN GIẢN VÀ RIÊNG TƯ
+• Không cần đăng ký, không cần tài khoản
+• Dữ liệu pin và cài đặt chỉ lưu trên máy bạn
+• Cài đặt, chọn mục tiêu, xong
+
+★ PHÙ HỢP VỚI
+• Bảo vệ sức khỏe pin và kéo dài tuổi thọ pin
+• Sạc qua đêm mà không sạc quá mức
+• Sạc nhanh làm đầy pin trong thời gian ngắn
+• Bất kỳ ai hay quên điện thoại trên bộ sạc
+
+Cắm sạc, đặt báo sạc đầy và để CHARGED nhắc bạn lúc rút sạc.
+
+CHARGED miễn phí và có quảng cáo. Quảng cáo do Google AdMob cung cấp.

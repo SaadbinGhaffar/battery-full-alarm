@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { AppState, Platform, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import * as Battery from 'expo-battery';
@@ -13,6 +13,7 @@ import { ensureNotificationPermission, setupNotificationChannel } from '../servi
 import { registerBackgroundTask } from '../services/backgroundTask';
 import { startForegroundMonitor, stopForegroundMonitor } from '../services/foregroundService';
 import { dismissChargeAlarm, handleBatteryReading, resetChargeSession } from '../services/chargeAlert';
+import { maybeAskForReview } from '../services/reviewPrompt';
 
 import RetroScene from '../components/retro/RetroScene';
 import RetroText from '../components/retro/RetroText';
@@ -28,6 +29,8 @@ import BannerAdSlot from '../ads/BannerAdSlot';
 
 const KEEP_AWAKE_TAG = 'charged-screen';
 const LOW_BATTERY = 20;
+/** Let the alarm screen close (and the app settle) before the review sheet. */
+const REVIEW_DELAY_MS = 2500;
 
 /** Hero number colors per battery mode: face + 3D side. */
 const HERO_COLORS = {
@@ -144,6 +147,26 @@ export default function HomeScreen() {
   // Stopping silences the alarm; it won't ring again until the next charge
   // session (unplug, or the level drops below the target).
   const dismissAlarm = dismissChargeAlarm;
+
+  // Ask for a rating once a real alarm has done its job (see reviewPrompt.js):
+  // shortly after the app is on screen with nothing ringing and no modal open.
+  useEffect(() => {
+    if (isAlarming || settingsOpen) return undefined;
+    let timer;
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(maybeAskForReview, REVIEW_DELAY_MS);
+    };
+    if (AppState.currentState === 'active') schedule();
+    const sub = AppState.addEventListener('change', (next) => {
+      if (next === 'active') schedule();
+      else clearTimeout(timer);
+    });
+    return () => {
+      clearTimeout(timer);
+      sub.remove();
+    };
+  }, [isAlarming, settingsOpen]);
 
   const handleTest = useCallback(() => {
     start({

@@ -1,0 +1,1 @@
+Báo động khi pin sạc đạt 80%, 90% hoặc 100%. Bảo vệ tuổi thọ pin điện thoại.

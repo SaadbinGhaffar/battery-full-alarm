@@ -1,0 +1,33 @@
+CHARGED, telefonun seçtiğin şarj seviyesine (%80, %90 veya %100) ulaştığı anda çalan bir pil doldu alarmıdır. Şarjı zamanında çıkar, aşırı şarjdan kaçın ve pil sağlığını koru.
+
+Telefonu saatlerce %100'de şarjda bırakmak lityum iyon pili daha hızlı yıpratır. %80 veya %90 şarj sınırı pile daha nazik davranır ve pilin daha uzun ömürlü olmasına yardımcı olur. CHARGED, hedefe ulaştığın anda yüksek sesli bir şarj doldu uyarısı verir, böylece şarjı ne zaman çıkaracağını bilirsin.
+
+★ KAÇIRMAYACAĞIN BİR PİL DOLDU ALARMI
+• Pil hedefe ulaştığı anda yüksek sesli, tekrarlayan şarj alarmı
+• Ses, titreşim ve bildirim, telefon sessizdeyken bile
+• Tek dokunuşla STOP düğmesi olan büyük "CHARGE COMPLETE!" ekranı
+• Şarj aletini çıkarınca alarm kendiliğinden durur
+
+★ ŞARJ SINIRINI SEÇ: %80, %90 VEYA %100
+Pil alarmının ne zaman çalacağına sen karar ver. %80 veya %90 sınırı pil yıpranmasını azaltır. %100 tam şarjda uyarır.
+
+★ ARKA PLANDA ÇALIŞIR
+Arka plan alarmı, uygulama veya ekran kapalıyken bile pil seviyesini izler ve izlerken küçük bir bildirim gösterir. Alarmı kilit ekranında bile doğrudan bildirimden durdurabilirsin.
+
+★ RETRO TASARIM
+Neon synthwave ızgara, piksel yazı tipleri ve atari tarzı pil göstergesi. Şarj alarmı sıkıcı olmak zorunda değil.
+
+★ BASİT VE GİZLİ
+• Kayıt yok, hesap yok
+• Pil verilerin ve ayarların cihazında kalır
+• Yükle, hedefini seç, bu kadar
+
+★ KİMLER İÇİN
+• Pil sağlığını korumak ve pil ömrünü uzatmak isteyenler
+• Gece boyunca aşırı şarj olmadan şarj etmek isteyenler
+• Pili hızla dolduran hızlı şarj aleti kullananlar
+• Telefonunu şarjda unutan herkes
+
+Şarja tak, şarj uyarını ayarla ve şarjı ne zaman çıkaracağını CHARGED söylesin.
+
+CHARGED ücretsizdir ve reklam içerir. Reklamlar Google AdMob tarafından sağlanır.
