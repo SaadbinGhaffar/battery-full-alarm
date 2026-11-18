@@ -6,19 +6,13 @@ Copy/paste these into **Play Console → Main store listing**. Character limits 
 
 ## Listing text (title, short and full description)
 
-The text lives in **`store/listing/<locale>/`**, one folder per language, one file per field:
+The live text is in **Play Console** (Main store listing + Manage translations), the source
+of truth from now on. Limits: App name 30, Short description 80, Full description 4000.
 
-| File | Play Console field | Limit |
-| --- | --- | --- |
-| `title.txt` | App name | 30 |
-| `short_description.txt` | Short description | 80 |
-| `full_description.txt` | Full description | 4000 |
+Locales published: en-US (default), es-419, pt-BR, hi-IN, id, tr-TR, ru-RU, vi, ar, fr-FR, de-DE.
 
-Locales: en-US (default), es-419, pt-BR, hi-IN, id, tr-TR, ru-RU, vi, ar, fr-FR, de-DE.
-Run `npm run listing:check` after any edit; it fails if a field is over Play's limit.
-
-**To add a translation in Play Console:** Grow → Store presence → Main store listing →
-Manage translations → Add your own translations → pick the language → paste the three files.
+The original files are in git history: `git show 57e456f:store/listing/<locale>/<field>.txt`
+(fields: `title`, `short_description`, `full_description`).
 
 ---
 

@@ -1,1 +1,0 @@
-Şarj %80, %90 veya %100 olunca çalan pil doldu alarmı. Pil sağlığını koru.
